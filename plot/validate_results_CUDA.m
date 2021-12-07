@@ -1,6 +1,10 @@
 % Author: Yannis Papagiannakos
 %
-% Read data (bin files) and plot fractal
+% Read data from .bin files and plot fractal
+
+COLORMAP = [jet(); ...
+            flipud( jet() ); ...
+            0 0 0];
 
 fid = fopen('../bin/count.bin','r','n');
 count = fread(fid, 'double');
@@ -19,4 +23,5 @@ fclose(fid);
 
 figure()
 imagesc( x, y, count );
-colormap( [jet();flipud( jet() );0 0 0] );axis off
+colormap(COLORMAP);
+axis off
