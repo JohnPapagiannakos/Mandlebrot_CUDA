@@ -7,8 +7,8 @@
 
 #define CUDA_VEC_BLOCK_SIZE 1024
 
-// __global__ void vecAdd(double *a, double *b, double *c, int n);
+extern "C" void cuaddv(double *A, double *B, double *C, int length);
 
-extern "C" void cuda_vecAdd(double *A, double *B, double *C, int length);
+extern "C" void cuJuliaOp2(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS);
 
-extern "C" void cuda_vecJuliaOp(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS);
+extern "C" void cuJuliaOp3(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS);
