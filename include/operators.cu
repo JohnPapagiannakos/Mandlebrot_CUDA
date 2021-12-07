@@ -2,7 +2,7 @@
 
 #include "operators.hpp"
 
-__device__ double margind(double x, double y)
+__device__ inline double margind(double x, double y)
 {
     return sqrt((x * x) + (y * y));
 }
@@ -29,11 +29,11 @@ __global__ void juliaOp2v(cuDoubleComplex *a, const cuDoubleComplex c, double *c
     // Make sure we do not go out of bounds
     if (id < n)
     {
-        double a_x = a[id].x;
-        double a_y = a[id].y;
+        double a_x = c.x;
+        double a_y = c.y;
 
-        a_x = (a[id].x * a[id].x) - (a[id].y * a[id].y) + c.x;
-        a_y = 2*(a[id].x * a[id].y) + c.y;
+        a_x += a[id].x * a[id].x - a[id].y * a[id].y;
+        a_y += 2*a[id].x * a[id].y;
         margin = margind(a_x, a_y);
         bool_count = (margin <= 2);
         count[id] = count[id] + bool_count;   
@@ -55,11 +55,11 @@ __global__ void juliaOp3v(cuDoubleComplex *a, const cuDoubleComplex c, double *c
     // Make sure we do not go out of bounds
     if (id < n)
     {
-        double a_x = a[id].x;
-        double a_y = a[id].y;
+        double a_x = c.x;
+        double a_y = c.y;
 
-        a_x = (a[id].x * ((a[id].x * a[id].x) - 3*(a[id].y * a[id].y))) + c.x;
-        a_y = (a[id].y * ((a[id].x * a[id].x) + a[id].x - (a[id].y * a[id].y * a[id].y))) + c.y;
+        a_x += a[id].x * (a[id].x * a[id].x - 3*a[id].y * a[id].y);
+        a_y += a[id].y * (3*a[id].x * a[id].x - a[id].y * a[id].y);
         margin = margind(a_x, a_y);
         bool_count = (margin <= 2);
         count[id] = count[id] + bool_count;   
