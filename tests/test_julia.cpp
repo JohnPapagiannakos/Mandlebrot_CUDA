@@ -21,19 +21,19 @@
 int main ( void ){
     using namespace std::complex_literals;
 
-    const int dim = 10000;
+    const int dim = 4000;
 
     std::array<int, 2> Dims = {dim, dim};
 
-    const int MAX_ITERS = 100;
+    const int MAX_ITERS = 300;
 
-    double offset = 0.5;
+    double offset = 1.5;
 
     std::array<double, 2> center = {0, 0};
 
-    double alpha = M_PI_2; // pi/4
+    double alpha = 3*M_PI_4; // pi/4
     std::complex<double> tmp_const_c = 0.7885 * std::exp(1i * alpha);
-    std::cout << tmp_const_c << std::endl;
+    std::cout << "c=" << tmp_const_c << std::endl;
     cuDoubleComplex const_c;
     const_c.x = real(tmp_const_c);
     const_c.y = imag(tmp_const_c);
@@ -82,20 +82,21 @@ int main ( void ){
         // std::cout << std::endl;
     }
 
-    cudaDeviceSynchronize();
 
     //
     std::chrono::time_point<std::chrono::system_clock> start, end;
 
+    cudaDeviceSynchronize();
     start = std::chrono::system_clock::now();
-    cuda_vecJuliaOp(z0, const_c, count, dim*dim, MAX_ITERS);
+    cuJuliaOp2(z0, const_c, count, dim * dim, MAX_ITERS);
+    // cuJuliaOp3(z0, const_c, count, dim*dim, MAX_ITERS);
+    cudaDeviceSynchronize();
     end = std::chrono::system_clock::now();
 
     std::chrono::duration<double> elapsed_seconds = end - start;
 
     std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
               
-    cudaDeviceSynchronize();
 
     Write_to_File(dim, dim, count, "count.bin");
     Write_to_File(dim, 1, &x_vec[0], "x.bin");
