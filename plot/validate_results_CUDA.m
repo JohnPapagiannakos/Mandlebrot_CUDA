@@ -21,7 +21,8 @@ fid = fopen('../bin/y.bin','r','n');
 y = fread(fid, 'double');
 fclose(fid);
 
-figure()
+fig1=figure();
 imagesc( x, y, count );
 colormap(COLORMAP);
 axis off
+saveas(fig1, 'juliaset', 'epsc'); 
