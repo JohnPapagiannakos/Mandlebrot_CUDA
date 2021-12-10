@@ -1,6 +1,6 @@
 // Author: Yannis Papagiannakos
 
-#include "operators.hpp"
+#include "cudaoperators.hpp"
 
 __device__ inline double margind(double x, double y)
 {
