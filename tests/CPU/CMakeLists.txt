@@ -1,4 +1,4 @@
-enable_language("CUDA")
+# enable_language("CUDA")
 
 add_executable(test_julia_cpu test_julia_cpu.cpp)
 

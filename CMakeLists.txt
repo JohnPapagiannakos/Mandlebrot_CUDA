@@ -14,17 +14,17 @@ SET(BIN_DIR                      "${CMAKE_CURRENT_LIST_DIR}/bin")
 
 
 SET(TEST_SRC_DIR                 ${CMAKE_CURRENT_LIST_DIR})
-SET(TEST_SRC_FILES               ${TEST_SRC_DIR}/test_julia.cu)
+# SET(TEST_SRC_FILES               ${TEST_SRC_DIR}/CUDA/test_julia.cu)
 
 SET(TEST_HEADER_FILES            ${INCLUDE_DIR})
 INCLUDE_DIRECTORIES(             ${TEST_HEADER_FILES})
 
 set(CMAKE_CXX_FLAGS              "${CMAKE_CXX_FLAGS} -std=c++17")
-SET(CMAKE_CXX_FLAGS_RELEASE      "-O3 -funroll-loops -march=native -mtune=native ")
+SET(CMAKE_CXX_FLAGS_RELEASE      "-O3 -fopenmp -funroll-loops -march=native -mtune=native ")
 set(CMAKE_CXX_FLAGS_DEBUG        "-g")
 
 add_subdirectory(include)
 
-add_subdirectory(tests)
+add_subdirectory(tests/CUDA)
 
-target_link_libraries(test_julia include ${TEST_HEADER_FILES})
+add_subdirectory(tests/CPU)
