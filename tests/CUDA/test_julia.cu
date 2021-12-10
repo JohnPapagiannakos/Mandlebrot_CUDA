@@ -2,7 +2,7 @@
 
 #include "cublas_v2.h"
 #include "cuda_runtime.h"
-#include "operators.hpp"
+#include "cudaoperators.hpp"
 #include "IO.hpp"
 
 #include <string>
@@ -21,11 +21,11 @@
 int main ( void ){
     using namespace std::complex_literals;
 
-    const int dim = 4000;
+    const int dim = 1000;
 
     std::array<int, 2> Dims = {dim, dim};
 
-    const int MAX_ITERS = 300;
+    const int MAX_ITERS = 500;
 
     double offset = 1.5;
 
@@ -33,7 +33,12 @@ int main ( void ){
 
     double alpha = 3*M_PI_4; // pi/4
     std::complex<double> tmp_const_c = 0.7885 * std::exp(1i * alpha);
-    std::cout << "c=" << tmp_const_c << std::endl;
+    
+    std::cout << "c=" << real(tmp_const_c);
+    if(imag(tmp_const_c)>=0)
+        std::cout << "+" << imag(tmp_const_c) << "i" << std::endl;
+    else
+        std::cout << imag(tmp_const_c) << "i" << std::endl;
     cuDoubleComplex const_c;
     const_c.x = real(tmp_const_c);
     const_c.y = imag(tmp_const_c);
@@ -77,19 +82,17 @@ int main ( void ){
             z0[lin_idx].x = x_vec[rows];
             z0[lin_idx].y = y_vec[cols];
             count[lin_idx] = 1;
-            // std::cout << z0[lin_idx].x << " " << z0[lin_idx].y << "1i" << "\t";
         }
-        // std::cout << std::endl;
     }
 
 
-    //
     std::chrono::time_point<std::chrono::system_clock> start, end;
-
+    
+    // Start timers
     cudaDeviceSynchronize();
     start = std::chrono::system_clock::now();
-    cuJuliaOp2(z0, const_c, count, dim * dim, MAX_ITERS);
-    // cuJuliaOp3(z0, const_c, count, dim*dim, MAX_ITERS);
+    // cuJuliaOp2(z0, const_c, count, dim * dim, MAX_ITERS);
+    cuJuliaOp3(z0, const_c, count, dim*dim, MAX_ITERS);
     cudaDeviceSynchronize();
     end = std::chrono::system_clock::now();
 
@@ -98,6 +101,7 @@ int main ( void ){
     std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
               
 
+    // Write resulting fractal to binary file
     Write_to_File(dim, dim, count, "count.bin");
     Write_to_File(dim, 1, &x_vec[0], "x.bin");
     Write_to_File(dim, 1, &y_vec[0], "y.bin");
