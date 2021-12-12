@@ -8,8 +8,18 @@
 
 #define CUDA_VEC_BLOCK_SIZE 1024
 
-extern "C" void cuaddv(double *A, double *B, double *C, int length);
+void cuaddv(double *A, double *B, double *C, int length);
 
-extern "C" void cuJuliaOp2(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS);
+namespace v1
+{
+    void cuJuliaOp2(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS);
 
-extern "C" void cuJuliaOp3(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS);
+    void cuJuliaOp3(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS);
+}
+
+inline namespace v2
+{
+    void cuJuliaOp2(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS);
+
+    void cuJuliaOp3(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS);
+}

@@ -43,6 +43,40 @@ __global__ void juliaOp2v(cuDoubleComplex *a, const cuDoubleComplex c, double *c
     }
 }
 
+__global__ void juliaOp2v(cuDoubleComplex *a, const cuDoubleComplex c, double *count, int n, int MAXITER)
+{
+    // Get our global thread ID
+    int id = blockIdx.x * blockDim.x + threadIdx.x;
+
+    // Make sure we do not go out of bounds
+    if (id < n)
+    {
+        double a_x=a[id].x, local_a_x;
+        double a_y=a[id].y, local_a_y;
+        double c_x = c.x;
+        double c_y = c.y;
+        
+        double local_count = 0;
+
+        double margin;
+
+        int bool_count;
+        for(int iter=0; iter<MAXITER; iter++)
+        {
+            local_a_x = a_x * a_x - a_y * a_y + c_x;
+            local_a_y = 2*a_x * a_y + c_y;
+            margin = margind(local_a_x, local_a_y);
+            bool_count = (margin <= 2);
+            local_count += bool_count;
+            a_x = local_a_x;
+            a_y = local_a_y;
+        }
+        count[id] = local_count;
+        a[id].x = a_x;
+        a[id].y = a_y;
+    }
+}
+
 __global__ void juliaOp3v(cuDoubleComplex *a, const cuDoubleComplex c, double *count, int n)
 {
     // Get our global thread ID
@@ -69,6 +103,41 @@ __global__ void juliaOp3v(cuDoubleComplex *a, const cuDoubleComplex c, double *c
     }
 }
 
+__global__ void juliaOp3v(cuDoubleComplex *a, const cuDoubleComplex c, double *count, int n, int MAXITER)
+{
+    // Get our global thread ID
+    int id = blockIdx.x * blockDim.x + threadIdx.x;
+
+    // Make sure we do not go out of bounds
+    if (id < n)
+    {
+        double a_x=a[id].x, local_a_x;
+        double a_y=a[id].y, local_a_y;
+        double c_x = c.x;
+        double c_y = c.y;
+        
+        double local_count = 0;
+
+        double margin;
+
+        int bool_count;
+        for(int iter=0; iter<MAXITER; iter++)
+        {
+            local_a_x = a_x * a_x - a_y * a_y + c_x;
+            local_a_y = 2*a_x * a_y + c_y;
+            local_a_x = a_x * (a_x * a_x - 3*a_y * a_y);
+            local_a_y = a_y * (3*a_x * a_x - a_y * a_y);
+            margin = margind(local_a_x, local_a_y);
+            bool_count = (margin <= 2);
+            local_count += bool_count;
+            a_x = local_a_x;
+            a_y = local_a_y;
+        }
+        count[id] = local_count;
+        a[id].x = a_x;
+        a[id].y = a_y;
+    }
+}
 __global__ void logv(double *a, int n)
 {
     // Get our global thread ID
@@ -80,7 +149,7 @@ __global__ void logv(double *a, int n)
 }
 
 
-extern "C" void cuaddv(double *A, double *B, double *C, int length)
+void cuaddv(double *A, double *B, double *C, int length)
 {
     int blockSize, gridSize;
     blockSize = CUDA_VEC_BLOCK_SIZE;
@@ -91,35 +160,64 @@ extern "C" void cuaddv(double *A, double *B, double *C, int length)
     addv<<<gridSize, blockSize>>>(A, B, C, length);
 }   
 
-
-extern "C" void cuJuliaOp2(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS)
+namespace v1 // slow
 {
-    int blockSize, gridSize;
-    blockSize = CUDA_VEC_BLOCK_SIZE;
-
-    // Number of thread blocks in grid
-    gridSize = (int)ceil((float)length / blockSize);
-
-    for(int iter=0; iter<=MAX_ITERS; iter++)
+    void cuJuliaOp2(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS)
     {
-        juliaOp2v<<<gridSize, blockSize>>>(z, c, count, length);
-    }
-    // cudaDeviceSynchronize();
-    logv<<<gridSize, blockSize>>>(count, length);
-} 
+        int blockSize, gridSize;
+        blockSize = CUDA_VEC_BLOCK_SIZE;
 
-extern "C" void cuJuliaOp3(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS)
+        // Number of thread blocks in grid
+        gridSize = (int)ceil((float)length / blockSize);
+
+        for(int iter=0; iter<=MAX_ITERS; iter++)
+        {
+            juliaOp2v<<<gridSize, blockSize>>>(z, c, count, length);
+        }
+        // cudaDeviceSynchronize();
+        logv<<<gridSize, blockSize>>>(count, length);
+    }
+
+    void cuJuliaOp3(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS)
+    {
+        int blockSize, gridSize;
+        blockSize = CUDA_VEC_BLOCK_SIZE;
+
+        // Number of thread blocks in grid
+        gridSize = (int)ceil((float)length / blockSize);
+
+        for(int iter=0; iter<=MAX_ITERS; iter++)
+        {
+            juliaOp3v<<<gridSize, blockSize>>>(z, c, count, length);
+        }
+        // cudaDeviceSynchronize();
+        logv<<<gridSize, blockSize>>>(count, length);
+    } 
+}
+
+inline namespace v2 //fast 
 {
-    int blockSize, gridSize;
-    blockSize = CUDA_VEC_BLOCK_SIZE;
-
-    // Number of thread blocks in grid
-    gridSize = (int)ceil((float)length / blockSize);
-
-    for(int iter=0; iter<=MAX_ITERS; iter++)
+    void cuJuliaOp2(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS)
     {
-        juliaOp3v<<<gridSize, blockSize>>>(z, c, count, length);
+        int blockSize, gridSize;
+        blockSize = CUDA_VEC_BLOCK_SIZE;
+
+        // Number of thread blocks in grid
+        gridSize = (int)ceil((float)length / blockSize);
+
+        juliaOp2v<<<gridSize, blockSize>>>(z, c, count, length, MAX_ITERS);
+        logv<<<gridSize, blockSize>>>(count, length);
     }
-    // cudaDeviceSynchronize();
-    logv<<<gridSize, blockSize>>>(count, length);
-} 
+
+    void cuJuliaOp3(cuDoubleComplex *z, const cuDoubleComplex c, double *count, int length, const int MAX_ITERS)
+    {
+        int blockSize, gridSize;
+        blockSize = CUDA_VEC_BLOCK_SIZE;
+
+        // Number of thread blocks in grid
+        gridSize = (int)ceil((float)length / blockSize);
+
+        juliaOp3v<<<gridSize, blockSize>>>(z, c, count, length, MAX_ITERS);
+        logv<<<gridSize, blockSize>>>(count, length);
+    }
+}
