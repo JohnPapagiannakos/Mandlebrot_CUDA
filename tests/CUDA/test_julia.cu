@@ -21,19 +21,23 @@
 int main ( void ){
     using namespace std::complex_literals;
 
-    const int dim = 1000;
+    const int dim = 2000;
 
     std::array<int, 2> Dims = {dim, dim};
 
     const int MAX_ITERS = 500;
 
-    double offset = 1.5;
+    double offset = 1.0;
 
     std::array<double, 2> center = {0, 0};
 
-    double alpha = 3*M_PI_4; // pi/4
-    std::complex<double> tmp_const_c = 0.7885 * std::exp(1i * alpha);
+    // double alpha = 3*M_PI_4; // pi/4
+    // DoubleComplex tmp_const_c = 0.7885 * std::exp(1i * alpha);
     
+    // DoubleComplex tmp_const_c = -1.476;
+
+    DoubleComplex tmp_const_c = -0.79 + 0.15i;
+
     std::cout << "c=" << real(tmp_const_c);
     if(imag(tmp_const_c)>=0)
         std::cout << "+" << imag(tmp_const_c) << "i" << std::endl;
@@ -91,8 +95,8 @@ int main ( void ){
     // Start timers
     cudaDeviceSynchronize();
     start = std::chrono::system_clock::now();
-    // cuJuliaOp2(z0, const_c, count, dim * dim, MAX_ITERS);
-    cuJuliaOp3(z0, const_c, count, dim*dim, MAX_ITERS);
+    cuJuliaOp2(z0, const_c, count, dim * dim, MAX_ITERS);
+    // cuJuliaOp3(z0, const_c, count, dim * dim, MAX_ITERS);
     cudaDeviceSynchronize();
     end = std::chrono::system_clock::now();
 

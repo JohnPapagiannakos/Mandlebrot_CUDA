@@ -19,18 +19,22 @@
 int main ( void ){
     using namespace std::complex_literals;
 
-    const int dim = 1000;
+    const int dim = 2000;
 
     std::array<int, 2> Dims = {dim, dim};
 
     const int MAX_ITERS = 500;
 
-    double offset = 1.5;
+    double offset = 1.0;
 
     std::array<double, 2> center = {0, 0};
 
-    double alpha = 3*M_PI_4; // pi/4
-    DoubleComplex const_c = 0.7885 * std::exp(1i * alpha);
+    // double alpha = 3*M_PI_4; // pi/4
+    // DoubleComplex const_c = 0.7885 * std::exp(1i * alpha);
+
+    // DoubleComplex const_c = -1.476;
+
+    DoubleComplex const_c = -0.79 + 0.15i;
 
     std::cout << "c=" << real(const_c);
     if(imag(const_c)>=0)
@@ -66,30 +70,17 @@ int main ( void ){
 
     // std::array<double, prod_dims> count;
 
-    // for (int cols=0; cols < dim; cols++)
-    // {
-    //     for (int rows = 0; rows < dim; rows++)
-    //     {
-    //         size_t lin_idx = (cols * dim) + rows;
-    //         z0[lin_idx].real(x_vec[rows]);
-    //         z0[lin_idx].imag(y_vec[cols]);
-    //         count[lin_idx] = 1;
-    //     }
-    // }
+    std::vector<DoubleComplex> z0(prod_dims);
 
-    std::vector<DoubleComplex> z0;
+    std::vector<double> count(prod_dims, 1);
 
-    std::vector<double> count;
-
-    for (int cols = 0; cols < dim; cols++)
+    for (int cols=0; cols < dim; cols++)
     {
         for (int rows = 0; rows < dim; rows++)
         {
-            DoubleComplex tmp;
-            tmp.real(x_vec[rows]);
-            tmp.imag(y_vec[cols]);
-            z0.push_back(tmp);
-            count.push_back(1);
+            size_t lin_idx = (cols * dim) + rows;
+            z0[lin_idx].real(x_vec[rows]);
+            z0[lin_idx].imag(y_vec[cols]);
         }
     }
 
@@ -97,8 +88,8 @@ int main ( void ){
     
     // Start timers
     start = std::chrono::system_clock::now();
-    JuliaOp2(&z0[0], const_c, &count[0], dim * dim, MAX_ITERS);
-    // JuliaOp3(&z0[0], const_c, &count[0], dim*dim, MAX_ITERS);
+    JuliaOp2(&z0[0], const_c, &count[0], prod_dims, MAX_ITERS);
+    // JuliaOp3(&z0[0], const_c, &count[0], prod_dims, MAX_ITERS);
     end = std::chrono::system_clock::now();
 
     std::chrono::duration<double> elapsed_seconds = end - start;
