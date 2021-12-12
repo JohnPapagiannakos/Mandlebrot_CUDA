@@ -1,17 +1,16 @@
 #include <omp.h>
 #include <iostream>
 #include <iomanip>
-#include <complex>
 #include <cmath>
+#include <types.hpp>
 
-#define CHUNKSIZE 8
-
-typedef std::complex<double> DoubleComplex;
+#define CHUNKSIZE 64
 
 inline double margind(DoubleComplex z)
 {
-    double x=real(z), y=imag(z);
-    return sqrt((x * x) + (y * y));
+    // double x = real(z), y = imag(z);
+    // return sqrt((x * x) + (y * y));
+    return sqrt(norm(z));
 }
 
 inline void z3(DoubleComplex &z, const DoubleComplex c)
@@ -42,7 +41,7 @@ inline void z2(DoubleComplex &z, const DoubleComplex c)
 
 inline void logv(double *a, int length)
 {
-    #pragma omp parallel for schedule(guided, CHUNKSIZE)
+    #pragma omp parallel for schedule(static, CHUNKSIZE)
     for (int idx = 0; idx < length; idx++)
     {
         a[idx] = std::log(a[idx]);
@@ -51,7 +50,7 @@ inline void logv(double *a, int length)
 
 inline void juliaop2(DoubleComplex *z, const DoubleComplex c, double *count, int length)
 {
-    #pragma omp parallel for schedule(guided, CHUNKSIZE)
+    #pragma omp parallel for schedule(static, CHUNKSIZE)
     for(int idx=0; idx<length; idx++)
     {
         z2(z[idx], c);
@@ -62,7 +61,7 @@ inline void juliaop2(DoubleComplex *z, const DoubleComplex c, double *count, int
 
 inline void juliaop3(DoubleComplex *z, const DoubleComplex c, double *count, int length)
 {
-    #pragma omp parallel for schedule(guided, CHUNKSIZE)
+    #pragma omp parallel for schedule(static, CHUNKSIZE)
     for (int idx = 0; idx < length; idx++)
     {
         z3(z[idx], c);

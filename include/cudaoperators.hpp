@@ -3,7 +3,8 @@
 #include "cuda.h"
 #include "cuda_runtime.h"
 #include <cuComplex.h>
-#include "device_launch_parameters.h"
+// #include "device_launch_parameters.h"
+#include <types.hpp>
 
 #define CUDA_VEC_BLOCK_SIZE 1024
 
