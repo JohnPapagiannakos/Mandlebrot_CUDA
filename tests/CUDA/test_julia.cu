@@ -1,9 +1,8 @@
 // Author: Yannis Papagiannakos
-
+#define USE_CUDA 1
 #include "cublas_v2.h"
 #include "cuda_runtime.h"
 #include "cudaoperators.hpp"
-#include "IO.hpp"
 
 #include <string>
 #include <iterator>
@@ -17,11 +16,12 @@
 #include <chrono>
 #include <ctime>
 
+#include "masterlib.hpp"
 
 int main ( void ){
     using namespace std::complex_literals;
 
-    const int dim = 2000;
+    const int dim = 5000;
 
     std::array<int, 2> Dims = {dim, dim};
 
@@ -47,10 +47,38 @@ int main ( void ){
     const_c.x = real(tmp_const_c);
     const_c.y = imag(tmp_const_c);
 
-    //
     std::array<double, 2> XLIM = {center[0] - offset, center[0] + offset};
     std::array<double, 2> YLIM = {center[1] - offset, center[1] + offset};
 
+
+    // Create meshgrid
+    cuDoubleComplex *z0;
+    cudaMallocManaged((void **)&z0, Dims[0] * Dims[1] * sizeof(cuDoubleComplex)); // unified mem.
+
+    z0 = cudameshgrid(XLIM, YLIM, Dims);
+
+    double *count;
+    cudaMallocManaged((void **)&count, Dims[0] * Dims[1] * sizeof(double)); // unified mem.
+    for(int idx=0; idx<Dims[0] * Dims[1]; idx++)
+        count[idx]=1.0;
+  
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+    
+    // Start timers
+    cudaDeviceSynchronize();
+    start = std::chrono::system_clock::now();
+    v2::cuJuliaOp2(z0, const_c, count, dim * dim, MAX_ITERS);
+    // v2::cuJuliaOp3(z0, const_c, count, dim * dim, MAX_ITERS);
+    cudaDeviceSynchronize();
+    end = std::chrono::system_clock::now();
+
+    std::chrono::duration<double> elapsed_seconds = end - start;
+
+    std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
+              
+
+    // Write resulting fractal to binary file
+    Write_to_File(dim, dim, count, "count.bin");
     std::array<double, dim> x_vec;
     std::array<double, dim> y_vec;
 
@@ -70,43 +98,6 @@ int main ( void ){
         y_vec[y] = y_vec[y-1] + dy;
     }
 
-
-    // Create meshgrid
-    cuDoubleComplex *z0;
-    cudaMallocManaged((void **)&z0, Dims[0] * Dims[1] * sizeof(cuDoubleComplex)); // unified mem.
-
-    double *count;
-    cudaMallocManaged((void **)&count, Dims[0] * Dims[1] * sizeof(double)); // unified mem.
-
-    for (int cols=0; cols < dim; cols++)
-    {
-        for (int rows = 0; rows < dim; rows++)
-        {
-            long int lin_idx = (cols * dim) + rows;
-            z0[lin_idx].x = x_vec[rows];
-            z0[lin_idx].y = y_vec[cols];
-            count[lin_idx] = 1;
-        }
-    }
-
-
-    std::chrono::time_point<std::chrono::system_clock> start, end;
-    
-    // Start timers
-    cudaDeviceSynchronize();
-    start = std::chrono::system_clock::now();
-    cuJuliaOp2(z0, const_c, count, dim * dim, MAX_ITERS);
-    // cuJuliaOp3(z0, const_c, count, dim * dim, MAX_ITERS);
-    cudaDeviceSynchronize();
-    end = std::chrono::system_clock::now();
-
-    std::chrono::duration<double> elapsed_seconds = end - start;
-
-    std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
-              
-
-    // Write resulting fractal to binary file
-    Write_to_File(dim, dim, count, "count.bin");
     Write_to_File(dim, 1, &x_vec[0], "x.bin");
     Write_to_File(dim, 1, &y_vec[0], "y.bin");
 
