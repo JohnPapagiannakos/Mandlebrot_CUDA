@@ -1,8 +1,5 @@
 // Author: Yannis Papagiannakos
 #define USE_CUDA 1
-#include "cublas_v2.h"
-#include "cuda_runtime.h"
-#include "cudaoperators.hpp"
 
 #include <string>
 #include <iterator>
@@ -50,25 +47,22 @@ int main ( void ){
     std::array<double, 2> XLIM = {center[0] - offset, center[0] + offset};
     std::array<double, 2> YLIM = {center[1] - offset, center[1] + offset};
 
-
     // Create meshgrid
-    cuDoubleComplex *z0;
-    cudaMallocManaged((void **)&z0, Dims[0] * Dims[1] * sizeof(cuDoubleComplex)); // unified mem.
+    size_t prod_dims = Dims[0] * Dims[1];
 
-    z0 = cudameshgrid(XLIM, YLIM, Dims);
+    cuDoubleComplex *z0 = cudameshgrid(XLIM, YLIM, Dims);
 
     double *count;
-    cudaMallocManaged((void **)&count, Dims[0] * Dims[1] * sizeof(double)); // unified mem.
-    for(int idx=0; idx<Dims[0] * Dims[1]; idx++)
-        count[idx]=1.0;
-  
+    cudaMallocManaged((void **)&count, prod_dims * sizeof(double)); // unified mem.
+
+    std::fill(&count[0], &count[prod_dims - 1], 1.0);
     std::chrono::time_point<std::chrono::system_clock> start, end;
     
     // Start timers
     cudaDeviceSynchronize();
     start = std::chrono::system_clock::now();
-    v2::cuJuliaOp2(z0, const_c, count, dim * dim, MAX_ITERS);
-    // v2::cuJuliaOp3(z0, const_c, count, dim * dim, MAX_ITERS);
+    v2::cuJuliaOp2(z0, const_c, count, prod_dims, MAX_ITERS);
+    // v2::cuJuliaOp3(z0, const_c, count, prod_dims, MAX_ITERS);
     cudaDeviceSynchronize();
     end = std::chrono::system_clock::now();
 
