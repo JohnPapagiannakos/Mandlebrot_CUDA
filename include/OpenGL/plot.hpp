@@ -11,7 +11,7 @@
 #include <array>
 #include <cassert>
 
-#include "constants.hpp"
+#include "OGLConstants.hpp"
 
 template <typename T>
 inline T type2Rbyte(const T &value)
