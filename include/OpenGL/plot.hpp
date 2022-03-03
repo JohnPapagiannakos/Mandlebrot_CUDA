@@ -63,7 +63,7 @@ class figure
             // Normalize data in [0, 1]
             T max = *max_element(_data.begin(), _data.end());
 
-            std::vector<double> tmpdata = _data;
+            std::vector<T> tmpdata = _data;
 
             for (size_t i = 0; i < prod_dims; i++)
             {
@@ -73,7 +73,7 @@ class figure
             // Multiply by 2 ^ 24
             for (size_t i = 0; i < prod_dims; i++)
             {
-                tmpdata[i] = tmpdata[i] * MAXINT_24BIT;
+                tmpdata[i] *= MAXINT_24BIT;
             }
 
             // Cast to unsigned int
