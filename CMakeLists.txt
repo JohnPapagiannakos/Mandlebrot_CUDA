@@ -28,3 +28,5 @@ add_subdirectory(include)
 add_subdirectory(tests/CUDA)
 
 add_subdirectory(tests/CPU)
+
+add_subdirectory(tests/OpenGL)
