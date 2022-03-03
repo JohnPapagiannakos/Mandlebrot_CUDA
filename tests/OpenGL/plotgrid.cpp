@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     std::vector<double> _data(prod_dims, 1);
 
     // Read double data from file
-    Read_From_File(prod_dims, &_data[0], filename.c_str(), 0);
+    Read_From_File<double>(prod_dims, &_data[0], filename.c_str(), 0);
 
     fig.plotRGB(_data);
 
