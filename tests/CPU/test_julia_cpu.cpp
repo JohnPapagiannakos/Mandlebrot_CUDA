@@ -14,12 +14,14 @@
 
 #include "masterlib.hpp"
 
+#include "OpenGL/plot.hpp"
+
 int main ( void ){
     using namespace std::complex_literals;
 
-    const int dim = 5000;
+    const int dim = 800;
 
-    std::array<int, 2> Dims = {dim, dim};
+    std::array<size_t, 2> Dims = {dim, dim};
 
     const int MAX_ITERS = 500;
 
@@ -66,7 +68,7 @@ int main ( void ){
               
 
     // Write resulting fractal to binary file
-    Write_to_File(dim, dim, &count[0], "count.bin");
+    Write_to_File<double>(dim, dim, &count[0], "count.bin");
 
     std::vector<double> x_vec(Dims[0]);
     std::vector<double> y_vec(Dims[1]);
@@ -87,8 +89,8 @@ int main ( void ){
         y_vec[y] = y_vec[y - 1] + dy;
     }
 
-    Write_to_File(dim, 1, &x_vec[0], "x.bin");
-    Write_to_File(dim, 1, &y_vec[0], "y.bin");
+    Write_to_File<double>(dim, 1, &x_vec[0], "x.bin");
+    Write_to_File<double>(dim, 1, &y_vec[0], "y.bin");
 
     return 0 ;
 }

@@ -18,9 +18,9 @@
 int main ( void ){
     using namespace std::complex_literals;
 
-    const int dim = 5000;
+    const size_t dim = 5000;
 
-    std::array<int, 2> Dims = {dim, dim};
+    std::array<size_t, 2> Dims = {dim, dim};
 
     const int MAX_ITERS = 500;
 
@@ -72,7 +72,7 @@ int main ( void ){
               
 
     // Write resulting fractal to binary file
-    Write_to_File(dim, dim, count, "count.bin");
+    Write_to_File<double>(dim, dim, count, "count.bin");
     std::array<double, dim> x_vec;
     std::array<double, dim> y_vec;
 
@@ -92,8 +92,8 @@ int main ( void ){
         y_vec[y] = y_vec[y-1] + dy;
     }
 
-    Write_to_File(dim, 1, &x_vec[0], "x.bin");
-    Write_to_File(dim, 1, &y_vec[0], "y.bin");
+    Write_to_File<double>(dim, 1, &x_vec[0], "x.bin");
+    Write_to_File<double>(dim, 1, &y_vec[0], "y.bin");
 
     cudaFree(z0);
     cudaFree(count);
