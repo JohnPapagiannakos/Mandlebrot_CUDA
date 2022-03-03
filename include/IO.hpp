@@ -6,7 +6,8 @@
 #include <cstdlib>   // std::rand, std::srand
 #include <string>
 
-void Write_to_File(int nrows, int ncols, double * Mat, const char *file_name)
+template <typename T>
+void Write_to_File(size_t nrows, size_t ncols, T *Mat, const char *file_name)
 {
     std::ofstream my_file(file_name, std::ios::out | std::ios::binary | std::ios::trunc);
     if (my_file.is_open())
@@ -18,7 +19,8 @@ void Write_to_File(int nrows, int ncols, double * Mat, const char *file_name)
         std::cout << "Unable to open file \n";
 }
 
-void Read_From_File(long int nrowsncols, double *Mat, const char *file_name, int skip)
+template <typename T>
+void Read_From_File(size_t nrowsncols, T *Mat, const char *file_name, size_t skip)
 {
     std::ifstream my_file(file_name, std::ios::in | std::ios::binary);
     if (my_file.is_open())
