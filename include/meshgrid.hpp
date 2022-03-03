@@ -9,7 +9,7 @@
     #include "cublas_v2.h"
     #include "cuda_runtime.h"
 #endif
-std::vector<DoubleComplex> meshgrid(std::array<double, 2> XLIM, std::array<double, 2> YLIM, std::array<int, 2> Dims)
+std::vector<DoubleComplex> meshgrid(std::array<double, 2> XLIM, std::array<double, 2> YLIM, std::array<size_t, 2> Dims)
 {
     std::vector<double> x_vec(Dims[0]);
     std::vector<double> y_vec(Dims[1]);
@@ -52,7 +52,7 @@ std::vector<DoubleComplex> meshgrid(std::array<double, 2> XLIM, std::array<doubl
 }
 
 #if USE_CUDA
-cuDoubleComplex * cudameshgrid(std::array<double, 2> XLIM, std::array<double, 2> YLIM, std::array<int, 2> Dims)
+cuDoubleComplex *cudameshgrid(std::array<double, 2> XLIM, std::array<double, 2> YLIM, std::array<size_t, 2> Dims)
 {
     std::vector<double> x_vec(Dims[0]);
     std::vector<double> y_vec(Dims[1]);
