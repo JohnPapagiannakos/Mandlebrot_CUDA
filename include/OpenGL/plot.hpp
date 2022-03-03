@@ -73,7 +73,7 @@ class figure
             // Multiply by 2 ^ 24
             for (size_t i = 0; i < prod_dims; i++)
             {
-                tmpdata[i] = tmpdata[i] * WHITE;
+                tmpdata[i] = tmpdata[i] * MAXINT_24BIT;
             }
 
             // Cast to unsigned int

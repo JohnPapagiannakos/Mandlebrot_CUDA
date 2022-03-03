@@ -1,6 +1,6 @@
 #ifndef OGLCONSTANTS_HPP
 #define OGLCONSTANTS_HPP
 
-#define WHITE 16777216
+#define MAXINT_24BIT 16777216
 
 #endif
