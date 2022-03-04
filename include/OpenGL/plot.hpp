@@ -39,6 +39,8 @@ class figure
 
         const std::array<size_t, 2> _maxResolution = {1920, 1080};
 
+        int window = -1;
+
         void initFigure(void)
         {
             int argc = 1;
@@ -48,11 +50,6 @@ class figure
             glutInitWindowSize(_resolution[0], _resolution[1]);
 
             assert((_resolution[0] <= _maxResolution[0] && _resolution[1] <= _maxResolution[1]));
-
-            glutCreateWindow("GLUT");
-
-            glClearColor(0, 0, 0, 1);
-            glClear(GL_COLOR_BUFFER_BIT);
         }
 
         void plot(const std::vector<T> &_data)
@@ -94,17 +91,23 @@ class figure
 
             glutSwapBuffers();
 
-            glutMainLoop();
+            // glutMainLoop();
         }
 
     public:
-        figure() : _resolution({1920, 1080}) {}
+        figure() : _resolution({1920, 1080})
+        {
+            initFigure();
+        }
 
-        figure(std::array<size_t, 2> Resolution) : _resolution(Resolution) {}
+        figure(std::array<size_t, 2> Resolution) : _resolution(Resolution)
+        {
+            initFigure();
+        }
 
         void plotRGB(const std::vector<double> &_DATA)
         {
-            initFigure();
+            // initFigure();
             for(auto &d: _resolution)
             {
                 std::cout << d << "\t";
@@ -112,7 +115,23 @@ class figure
             std::cout << std::endl;
             plot(_DATA);
         }
+
+        void newFigure(void)
+        {
+            window = glutCreateWindow("GLUT");
+            assert(window != -1);
+
+            glClearColor(0, 0, 0, 1);
+            glClear(GL_COLOR_BUFFER_BIT);
+        }
         
+        void closeFigure(void)
+        {
+            if (window==-1)
+            { 
+                glutDestroyWindow(window);
+            }
+        }
 };
 
 
