@@ -7,12 +7,12 @@
 #include <string>
 
 template <typename T>
-void Write_to_File(size_t nrows, size_t ncols, T *Mat, const char *file_name)
+void Write_to_File(size_t nrowsncols, T *Mat, const char *file_name)
 {
     std::ofstream my_file(file_name, std::ios::out | std::ios::binary | std::ios::trunc);
     if (my_file.is_open())
     {
-        my_file.write((char *)Mat, nrows * ncols * sizeof(double));
+        my_file.write((char *)Mat, nrowsncols * sizeof(double));
         my_file.close();
     }
     else
