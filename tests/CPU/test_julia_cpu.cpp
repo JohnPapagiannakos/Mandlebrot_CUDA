@@ -68,7 +68,7 @@ int main ( void ){
               
 
     // Write resulting fractal to binary file
-    Write_to_File<double>(dim, dim, &count[0], "count.bin");
+    Write_to_File<double>(prod_dims, &count[0], "count.bin");
 
     std::vector<double> x_vec(Dims[0]);
     std::vector<double> y_vec(Dims[1]);
@@ -89,8 +89,8 @@ int main ( void ){
         y_vec[y] = y_vec[y - 1] + dy;
     }
 
-    Write_to_File<double>(dim, 1, &x_vec[0], "x.bin");
-    Write_to_File<double>(dim, 1, &y_vec[0], "y.bin");
+    Write_to_File<double>(dim, &x_vec[0], "x.bin");
+    Write_to_File<double>(dim, &y_vec[0], "y.bin");
 
     return 0 ;
 }
