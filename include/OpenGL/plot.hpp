@@ -1,7 +1,9 @@
 #ifndef PLOT_HPP
 #define PLOT_HPP
 
+#include <GL/glew.h> // <- NOTE: Include this lib first.
 #include <GL/glut.h>
+
 // #include <cstdlib>
 #include <iostream>
 #include <cstdlib>
@@ -39,15 +41,22 @@ class figure
 
         const std::array<size_t, 2> _maxResolution = {1920, 1080};
 
-        int window = -1;
+        int windowID = -1;
 
         void initFigure(void)
         {
             int argc = 1;
             char *argv[1] = {(char *)"unused"};
             glutInit(&argc, argv);
+            
             glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
             glutInitWindowSize(_resolution[0], _resolution[1]);
+            
+            GLenum error_code = glewInit();
+            if (error_code != 0)
+            {
+                std::cerr << "Error initiallizing glew : " << glewGetErrorString(error_code) << std::endl;
+            }
 
             assert((_resolution[0] <= _maxResolution[0] && _resolution[1] <= _maxResolution[1]));
         }
@@ -118,19 +127,27 @@ class figure
 
         void newFigure(void)
         {
-            window = glutCreateWindow("GLUT");
-            assert(window != -1);
+            newFigure("Figure");
+        }
+
+        void newFigure(const char *title)
+        {
+            windowID = glutCreateWindow(title);
+            assert(windowID != -1);
+            // glutSetWindow(windowID);
 
             glClearColor(0, 0, 0, 1);
             glClear(GL_COLOR_BUFFER_BIT);
+            return;
         }
-        
+
         void closeFigure(void)
         {
-            if (window != -1)
+            if (windowID > 0)
             { 
-                glutDestroyWindow(window);
+                glutDestroyWindow(windowID);
             }
+            return;
         }
 };
 
