@@ -127,7 +127,7 @@ class figure
         
         void closeFigure(void)
         {
-            if (window==-1)
+            if (window != -1)
             { 
                 glutDestroyWindow(window);
             }
