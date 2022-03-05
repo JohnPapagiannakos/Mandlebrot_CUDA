@@ -15,6 +15,17 @@
 
 #include "OGLConstants.hpp"
 
+/* Let a 24-bit number N = B23 B22 ... B01 B00
+   We can assume that this number can be represented in RGB 24bit color model as follows:
+
+    <Red>  := B23 B22 ... B17 (8bit)
+   <Green> := B15 B14 ... B08 (8bit)
+   <Blue>  := B07 B06 ... B00 (8bit)
+
+   Each color information can be extracted through typeXbyte (X:R,G,B).
+
+*/
+
 template <typename T>
 inline T type2Rbyte(const T &value)
 {
@@ -82,21 +93,20 @@ class figure
                 tmpdata[i] *= MAXINT_24BIT;
             }
 
-            // Cast to unsigned int
-            unsigned int data[_resolution[0]][_resolution[1]][3];
+            GLubyte data[_resolution[0]][_resolution[1]][3];
             for (size_t row = 0; row < _resolution[0]; ++row)
             {
                 for (size_t col = 0; col < _resolution[1]; ++col)
                 {
                     unsigned int test = static_cast<unsigned int>(tmpdata[col + row * _resolution[0]]);
                     // [0] : R, [1] : G, [2] : B
-                    data[row][col][0] = (type2Rbyte<unsigned int>(test)) << 24;
-                    data[row][col][1] = (type2Gbyte<unsigned int>(test)) << 24;
-                    data[row][col][2] = (type2Bbyte<unsigned int>(test)) << 24;
+                    data[row][col][0] = (type2Rbyte<unsigned int>(test));
+                    data[row][col][1] = (type2Gbyte<unsigned int>(test));
+                    data[row][col][2] = (type2Bbyte<unsigned int>(test));
                 }
             }
 
-            glDrawPixels(_resolution[0], _resolution[1], GL_RGB, GL_UNSIGNED_INT, data);
+            glDrawPixels(_resolution[0], _resolution[1], GL_RGB, GL_UNSIGNED_BYTE, data);
 
             glutSwapBuffers();
 
@@ -148,6 +158,11 @@ class figure
                 glutDestroyWindow(windowID);
             }
             return;
+        }
+
+        void showFigure(void)
+        {
+            glutMainLoop();
         }
 };
 
