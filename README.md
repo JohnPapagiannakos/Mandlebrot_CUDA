@@ -1,4 +1,4 @@
-## Mandlebrot_CUDA (2021)
+## Mandlebrot_CUDA (2021 - )
 Mandlebrot_CUDA is a library that provides parallelized methods (GPU or CPU) for generating Julia set fractals.
 
 
