@@ -93,16 +93,17 @@ class figure
                 tmpdata[i] *= MAXINT_24BIT;
             }
 
-            GLubyte data[_resolution[0]][_resolution[1]][3];
+            GLubyte data[_resolution[0] * _resolution[1] * 3];
             for (size_t row = 0; row < _resolution[0]; ++row)
             {
                 for (size_t col = 0; col < _resolution[1]; ++col)
                 {
                     unsigned int test = static_cast<unsigned int>(tmpdata[col + row * _resolution[0]]);
                     // [0] : R, [1] : G, [2] : B
-                    data[row][col][0] = (type2Rbyte<unsigned int>(test));
-                    data[row][col][1] = (type2Gbyte<unsigned int>(test));
-                    data[row][col][2] = (type2Bbyte<unsigned int>(test));
+                    size_t lin_idx = (col + row * _resolution[0]) * 3;
+                    data[lin_idx + 0] = (type2Rbyte<unsigned int>(test));
+                    data[lin_idx + 1] = (type2Gbyte<unsigned int>(test));
+                    data[lin_idx + 2] = (type2Bbyte<unsigned int>(test));
                 }
             }
 
