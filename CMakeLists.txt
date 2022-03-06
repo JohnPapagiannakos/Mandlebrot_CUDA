@@ -30,3 +30,5 @@ add_subdirectory(tests/CUDA)
 add_subdirectory(tests/CPU)
 
 add_subdirectory(tests/OpenGL)
+
+add_subdirectory(tests/compute_and_plot)
