@@ -20,7 +20,7 @@
 int main ( void ){
     using namespace std::complex_literals;
 
-    const int dim = 800;
+    const int dim = 1000;
 
     std::array<size_t, 2> Dims = {dim, dim};
 
@@ -30,10 +30,10 @@ int main ( void ){
 
     std::array<double, 2> center = {0, 0};
 
-    double alpha = 3*M_PI_4; // pi/4
-    DoubleComplex const_c = 0.7885 * std::exp(1i * alpha);
+    // double alpha = 3*M_PI_4; // pi/4
+    // DoubleComplex const_c = 0.7885 * std::exp(1i * alpha);
 
-    // DoubleComplex const_c = -1.476;
+    DoubleComplex const_c = -1.476;
 
     // DoubleComplex const_c = -0.79 + 0.15i;
 
@@ -67,13 +67,12 @@ int main ( void ){
 
     std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
 
+    // Illustrate fractal
     figure<double> fig(Dims);
-
-    // Read double data from file
     fig.newFigure("Fig 1");
     fig.plotRGB(count);
     // fig.showFigure();
-    sleep(2);
+    sleep(5);
     fig.closeFigure();
 
 
