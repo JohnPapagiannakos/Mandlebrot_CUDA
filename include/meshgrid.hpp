@@ -37,14 +37,14 @@ std::vector<DoubleComplex> meshgrid(std::array<double, 2> XLIM, std::array<doubl
 
     std::vector<double> count(prod_dims, 1);
 
-    for (int cols = 0; cols < Dims[0]; cols++)
+    for (size_t cols = 0; cols < Dims[1]; cols++)
     {
-        for (int rows = 0; rows < Dims[1]; rows++)
+        size_t lin_idx = (cols * Dims[0]);
+        for (size_t rows = 0; rows < Dims[0]; rows++)
         {
-            size_t lin_idx = (cols * Dims[0]) + rows;
-
             z0[lin_idx].real(x_vec[rows]);
             z0[lin_idx].imag(y_vec[cols]);
+            lin_idx++;
         }
     }
 
@@ -79,13 +79,14 @@ cuDoubleComplex *cudameshgrid(std::array<double, 2> XLIM, std::array<double, 2> 
     cuDoubleComplex *z0;
     cudaMallocManaged((void **)&z0, Dims[0] * Dims[1] * sizeof(cuDoubleComplex));
 
-    for (int cols = 0; cols < Dims[0]; cols++)
+    for (size_t cols = 0; cols < Dims[1]; cols++)
     {
-        for (int rows = 0; rows < Dims[1]; rows++)
+        size_t lin_idx = (cols * Dims[0]);
+        for (size_t rows = 0; rows < Dims[0]; rows++)
         {
-            size_t lin_idx = (cols * Dims[0]) + rows;
             z0[lin_idx].x = x_vec[rows];
             z0[lin_idx].y = y_vec[cols];
+            lin_idx++;
         }
     }
     return z0;

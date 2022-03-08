@@ -3,7 +3,6 @@
 
 #include <GL/glew.h> // <- NOTE: Include this lib first.
 #include <GL/glut.h>
-
 // #include <cstdlib>
 #include <iostream>
 #include <cstdlib>
@@ -94,16 +93,18 @@ class figure
             }
 
             GLubyte data[_resolution[0] * _resolution[1] * 3];
-            for (size_t row = 0; row < _resolution[0]; ++row)
+            for (size_t col = 0; col < _resolution[1]; ++col)
             {
-                for (size_t col = 0; col < _resolution[1]; ++col)
+                size_t lin_idx = (col * _resolution[0]);
+                for (size_t row = 0; row < _resolution[0]; ++row)
                 {
-                    unsigned int test = static_cast<unsigned int>(tmpdata[col + row * _resolution[0]]);
+                    unsigned int test = static_cast<unsigned int>(tmpdata[row + col * _resolution[0]]);
                     // [0] : R, [1] : G, [2] : B
-                    size_t lin_idx = (col + row * _resolution[0]) * 3;
-                    data[lin_idx + 0] = (type2Rbyte<unsigned int>(test));
-                    data[lin_idx + 1] = (type2Gbyte<unsigned int>(test));
-                    data[lin_idx + 2] = (type2Bbyte<unsigned int>(test));
+                    size_t lin_idx3D = lin_idx * 3;
+                    data[lin_idx3D + 0] = (type2Rbyte<unsigned int>(test));
+                    data[lin_idx3D + 1] = (type2Gbyte<unsigned int>(test));
+                    data[lin_idx3D + 2] = (type2Bbyte<unsigned int>(test));
+                    lin_idx++;
                 }
             }
 
@@ -154,9 +155,11 @@ class figure
 
         void closeFigure(void)
         {
+            // glutLeaveMainLoop(); // needs freeglut.h
             if (windowID > 0)
             { 
                 glutDestroyWindow(windowID);
+                // glutDestroyWindow(glutGetWindow());
             }
             return;
         }
