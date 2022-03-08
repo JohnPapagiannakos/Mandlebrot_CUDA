@@ -4,8 +4,8 @@ find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)
 
-set(TEST_SRC_FILE_NAMES test_julia_plot
-                        test_julia_plot_iterative 
+set(TEST_SRC_FILE_NAMES test_compute_and_plot_cuda
+                        test_compute_and_plot_iterative_cuda 
                         )
 
 include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )

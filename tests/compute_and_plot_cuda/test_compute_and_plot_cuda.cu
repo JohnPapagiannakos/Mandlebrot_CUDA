@@ -94,5 +94,8 @@ int main ( void ){
     sleep(5);
     fig.closeFigure();
 
-    return 0 ;
+    cudaFree(z0);
+    cudaFree(count);
+
+    return 0;
 }
