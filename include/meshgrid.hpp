@@ -1,6 +1,6 @@
 #include <array>
 #include <vector>
-
+#include <cassert>
 #include <types.hpp>
 #include <type_traits>
 #include <iostream>
@@ -9,7 +9,7 @@
     #include "cublas_v2.h"
     #include "cuda_runtime.h"
 #endif
-std::vector<DoubleComplex> meshgrid(std::array<double, 2> XLIM, std::array<double, 2> YLIM, std::array<size_t, 2> Dims)
+void meshgrid(std::array<double, 2> XLIM, std::array<double, 2> YLIM, std::array<size_t, 2> Dims, std::vector<DoubleComplex> &z0)
 {
     std::vector<double> x_vec(Dims[0]);
     std::vector<double> y_vec(Dims[1]);
@@ -33,7 +33,7 @@ std::vector<DoubleComplex> meshgrid(std::array<double, 2> XLIM, std::array<doubl
     // Create meshgrid
     size_t prod_dims = Dims[0] * Dims[1];
 
-    std::vector<DoubleComplex> z0(prod_dims);
+    assert(z0.size() == prod_dims);
 
     std::vector<double> count(prod_dims, 1);
 
@@ -47,12 +47,10 @@ std::vector<DoubleComplex> meshgrid(std::array<double, 2> XLIM, std::array<doubl
             lin_idx++;
         }
     }
-
-    return z0;
 }
 
 #if USE_CUDA
-cuDoubleComplex *cudameshgrid(std::array<double, 2> XLIM, std::array<double, 2> YLIM, std::array<size_t, 2> Dims)
+void cudameshgrid(std::array<double, 2> XLIM, std::array<double, 2> YLIM, std::array<size_t, 2> Dims, cuDoubleComplex *z0)
 {
     std::vector<double> x_vec(Dims[0]);
     std::vector<double> y_vec(Dims[1]);
@@ -76,8 +74,8 @@ cuDoubleComplex *cudameshgrid(std::array<double, 2> XLIM, std::array<double, 2> 
     // Create meshgrid
     size_t prod_dims = Dims[0] * Dims[1];
 
-    cuDoubleComplex *z0;
-    cudaMallocManaged((void **)&z0, Dims[0] * Dims[1] * sizeof(cuDoubleComplex));
+    // cuDoubleComplex *z0;
+    // cudaMallocManaged((void **)&z0, Dims[0] * Dims[1] * sizeof(cuDoubleComplex));
 
     for (size_t cols = 0; cols < Dims[1]; cols++)
     {
@@ -89,6 +87,5 @@ cuDoubleComplex *cudameshgrid(std::array<double, 2> XLIM, std::array<double, 2> 
             lin_idx++;
         }
     }
-    return z0;
 }
 #endif

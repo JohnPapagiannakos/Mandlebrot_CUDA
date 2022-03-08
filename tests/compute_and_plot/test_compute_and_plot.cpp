@@ -51,7 +51,8 @@ int main ( void ){
     // Create meshgrid
     size_t prod_dims = Dims[0] * Dims[1];
 
-    std::vector<DoubleComplex> z0 = meshgrid(XLIM, YLIM, Dims);
+    std::vector<DoubleComplex> z0(prod_dims);
+    meshgrid(XLIM, YLIM, Dims, z0);
 
     std::vector<double> count(prod_dims, 1);
 

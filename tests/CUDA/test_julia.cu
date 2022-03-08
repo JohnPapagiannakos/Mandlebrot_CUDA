@@ -50,7 +50,9 @@ int main ( void ){
     // Create meshgrid
     size_t prod_dims = Dims[0] * Dims[1];
 
-    cuDoubleComplex *z0 = cudameshgrid(XLIM, YLIM, Dims);
+    cuDoubleComplex *z0;
+    cudaMallocManaged((void **)&z0, Dims[0] * Dims[1] * sizeof(cuDoubleComplex));
+    cudameshgrid(XLIM, YLIM, Dims, z0);
 
     double *count;
     cudaMallocManaged((void **)&count, prod_dims * sizeof(double)); // unified mem.

@@ -60,8 +60,9 @@ int main ( void ){
     std::array<double, 2> YLIM = {center[1] - offset_y, center[1] + offset_y};
 
     // Create meshgrid
-
-    cuDoubleComplex *z0 = cudameshgrid(XLIM, YLIM, Dims);
+    cuDoubleComplex *z0;
+    cudaMallocManaged((void **)&z0, Dims[0] * Dims[1] * sizeof(cuDoubleComplex));
+    cudameshgrid(XLIM, YLIM, Dims, z0);
 
     double *count;
     cudaMallocManaged((void **)&count, prod_dims * sizeof(double)); // unified mem.
@@ -86,11 +87,14 @@ int main ( void ){
     fig.newFigure("Mandelbrot Set");
     fig.plotRGB(_data);
     // fig.showFigure();
-    sleep(1);
+    // sleep(1);
+    std::chrono::time_point<std::chrono::system_clock> start, end;
 
     int while_iters = 0;
     while(while_iters < MAX_WHILE_ITERS)
     {
+        start = std::chrono::system_clock::now();
+
         offset_x *= 0.8;
         offset_y *= 0.8;
         center[0] = offset_x;
@@ -99,7 +103,7 @@ int main ( void ){
         YLIM = {center[1] - offset_y, center[1] + offset_y};
 
         // Create meshgrid
-        z0 = cudameshgrid(XLIM, YLIM, Dims);
+        cudameshgrid(XLIM, YLIM, Dims, z0);
 
         std::fill(&count[0], &count[prod_dims - 1], 1.0);
        
@@ -117,7 +121,12 @@ int main ( void ){
         }
 
         fig.plotRGB(_data);
-        sleep(1);
+        // sleep(1);
+        end = std::chrono::system_clock::now();
+
+        std::chrono::duration<double> elapsed_seconds = end - start;
+
+        std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
         while_iters++;
     }
 
