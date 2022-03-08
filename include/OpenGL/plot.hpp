@@ -25,20 +25,26 @@
 
 */
 
-template <typename T>
-inline T type2Rbyte(const T &value)
+/*
+    Extract Red color from a 24bit number (24-bit RGB model).
+ */
+inline GLubyte uint2Rbyte(const unsigned int &value)
 {
     return value >> 16;
 }
 
-template <typename T>
-inline T type2Gbyte(const T &value)
+/*
+    Extract Green color from a 24bit number (24-bit RGB model).
+ */
+inline GLubyte uint2Gbyte(const unsigned int &value)
 {
     return (value >> 8) & 255;
 }
 
-template <typename T>
-inline T type2Bbyte(const T &value)
+/*
+    Extract Blue color from a 24bit number (24-bit RGB model).
+ */
+inline GLubyte uint2Bbyte(const unsigned int &value)
 {
     return value & 255;
 }
@@ -106,9 +112,9 @@ class figure
                     unsigned int test = static_cast<unsigned int>(tmpdata[row + col * _resolution[0]]);
                     // [0] : R, [1] : G, [2] : B
                     size_t lin_idx3D = lin_idx * 3;
-                    data[lin_idx3D + 0] = (type2Rbyte<unsigned int>(test));
-                    data[lin_idx3D + 1] = (type2Gbyte<unsigned int>(test));
-                    data[lin_idx3D + 2] = (type2Bbyte<unsigned int>(test));
+                    data[lin_idx3D + 0] = uint2Rbyte(test);
+                    data[lin_idx3D + 1] = uint2Gbyte(test);
+                    data[lin_idx3D + 2] = uint2Bbyte(test);
                     lin_idx++;
                 }
             }
@@ -121,10 +127,10 @@ class figure
         }
 
         /*
-        clim argument specifies the data values that map to the first and last elements of the colormap. 
-        Specify clims as a two-element vector of the form {cmin cmax}, where values less than or equal 
-        to cmin map to the first color in the colormap and values greater than or equal to cmax map to 
-        the last color in the colormap. Specify clims after name-value pair arguments.
+            clim argument specifies the data values that map to the first and last elements of the colormap. 
+            Specify clims as a two-element vector of the form {cmin, cmax}, where values less than or equal 
+            to cmin map to the first color in the colormap and values greater than or equal to cmax map to 
+            the last color in the colormap. Specify clims after name-value pair arguments.
          */
         void plot(const std::vector<T> &_data, const std::array<T,2> &clim)
         {
