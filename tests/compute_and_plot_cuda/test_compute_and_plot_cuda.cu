@@ -21,13 +21,20 @@
 int main ( void ){
     using namespace std::complex_literals;
 
-    const size_t dim = 1000;
+    // const size_t dim = 1000;
 
-    std::array<size_t, 2> Dims = {dim, dim};
+    // std::array<size_t, 2> Dims = {dim, dim};
+    std::array<size_t, 2> Dims = {1920, 1080};
 
     const int MAX_ITERS = 500;
 
-    double offset = 1.0;
+    // double offset_x = 1.0;
+    // double offset_y = 1.0;
+
+    double ratio = Dims[0] / Dims[1];
+
+    double offset_x = ratio;
+    double offset_y = 1.0;
 
     std::array<double, 2> center = {0, 0};
 
@@ -47,8 +54,8 @@ int main ( void ){
     const_c.x = real(tmp_const_c);
     const_c.y = imag(tmp_const_c);
 
-    std::array<double, 2> XLIM = {center[0] - offset, center[0] + offset};
-    std::array<double, 2> YLIM = {center[1] - offset, center[1] + offset};
+    std::array<double, 2> XLIM = {center[0] - offset_x, center[0] + offset_x};
+    std::array<double, 2> YLIM = {center[1] - offset_y, center[1] + offset_y};
 
     // Create meshgrid
     size_t prod_dims = Dims[0] * Dims[1];
