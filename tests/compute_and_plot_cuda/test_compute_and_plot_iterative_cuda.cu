@@ -22,14 +22,14 @@ int main ( void ){
     using namespace std::complex_literals;
 
     // const size_t dim = 1000;
-
+    
     // std::array<size_t, 2> Dims = {dim, dim};
     std::array<size_t, 2> Dims = {1920, 1080};
+    size_t prod_dims = Dims[0] * Dims[1];
 
     const int MAX_ITERS = 500;
 
-    // double offset_x = 1.0;
-    // double offset_y = 1.0;
+    const int MAX_WHILE_ITERS = 10;
 
     double ratio = Dims[0] / Dims[1];
 
@@ -43,7 +43,9 @@ int main ( void ){
     
     // DoubleComplex tmp_const_c = -1.476;
 
-    DoubleComplex tmp_const_c = -0.79 + 0.15i;
+    // DoubleComplex tmp_const_c = -0.79 + 0.15i;
+
+    DoubleComplex tmp_const_c = 0.28 + 0.008i;
 
     std::cout << "c=" << real(tmp_const_c);
     if(imag(tmp_const_c)>=0)
@@ -58,7 +60,6 @@ int main ( void ){
     std::array<double, 2> YLIM = {center[1] - offset_y, center[1] + offset_y};
 
     // Create meshgrid
-    size_t prod_dims = Dims[0] * Dims[1];
 
     cuDoubleComplex *z0 = cudameshgrid(XLIM, YLIM, Dims);
 
@@ -66,19 +67,13 @@ int main ( void ){
     cudaMallocManaged((void **)&count, prod_dims * sizeof(double)); // unified mem.
 
     std::fill(&count[0], &count[prod_dims - 1], 1.0);
-    std::chrono::time_point<std::chrono::system_clock> start, end;
     
     // Start timers
     cudaDeviceSynchronize();
-    start = std::chrono::system_clock::now();
     v2::cuJuliaOp2(z0, const_c, count, prod_dims, MAX_ITERS);
     // v2::cuJuliaOp3(z0, const_c, count, prod_dims, MAX_ITERS);
     cudaDeviceSynchronize();
-    end = std::chrono::system_clock::now();
 
-    std::chrono::duration<double> elapsed_seconds = end - start;
-
-    std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
 
     std::vector<double> _data(prod_dims, 1);
     for (size_t idx = 0; idx < prod_dims; idx++)
@@ -88,11 +83,46 @@ int main ( void ){
 
     // Illustrate fractal
     figure<double> fig(Dims);
-    fig.newFigure("Fig 1");
+    fig.newFigure("Mandelbrot Set");
     fig.plotRGB(_data);
     // fig.showFigure();
-    sleep(5);
-    fig.closeFigure();
+    sleep(1);
 
-    return 0 ;
+    int while_iters = 0;
+    while(while_iters < MAX_WHILE_ITERS)
+    {
+        offset_x *= 0.8;
+        offset_y *= 0.8;
+        center[0] = offset_x;
+        center[1] = offset_y;
+        XLIM = {center[0] - offset_x, center[0] + offset_x};
+        YLIM = {center[1] - offset_y, center[1] + offset_y};
+
+        // Create meshgrid
+        z0 = cudameshgrid(XLIM, YLIM, Dims);
+
+        std::fill(&count[0], &count[prod_dims - 1], 1.0);
+       
+        // Start timers
+        cudaDeviceSynchronize();
+        v2::cuJuliaOp2(z0, const_c, count, prod_dims, MAX_ITERS);
+        // v2::cuJuliaOp3(z0, const_c, count, prod_dims, MAX_ITERS);
+        cudaDeviceSynchronize();
+
+
+        std::vector<double> _data(prod_dims, 1);
+        for (size_t idx = 0; idx < prod_dims; idx++)
+        {
+            _data[idx] = count[idx];
+        }
+
+        fig.plotRGB(_data);
+        sleep(1);
+        while_iters++;
+    }
+
+    cudaFree(z0);
+    cudaFree(count);
+
+    return 0;
 }
