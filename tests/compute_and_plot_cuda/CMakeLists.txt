@@ -4,24 +4,30 @@ find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)
 
+set(TEST_SRC_FILE_NAMES test_julia_plot
+                        test_julia_plot_iterative 
+                        )
+
 include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
 
-add_executable(test_julia_plot_cuda test_julia_plot.cu)
+foreach(TEST IN LISTS TEST_SRC_FILE_NAMES)
+    add_executable(${TEST} ${TEST}.cu)
 
-SET_TARGET_PROPERTIES(test_julia_plot_cuda 
-                      PROPERTIES 
-                      RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR}
-)
+    SET_TARGET_PROPERTIES(${TEST} 
+                        PROPERTIES 
+                        RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR}
+    )
 
-target_link_libraries(test_julia_plot_cuda 
-                        include 
-                        ${TEST_HEADER_FILES}
-                        OpenGL::GL
-                        OpenGL::GLU
-                        GLUT::GLUT
-                        GLEW::GLEW
-                        m)
+    target_link_libraries(${TEST} 
+                            include 
+                            ${TEST_HEADER_FILES}
+                            OpenGL::GL
+                            OpenGL::GLU
+                            GLUT::GLUT
+                            GLEW::GLEW
+                            m)
 
-add_dependencies(test_julia_plot_cuda OpenGL::OpenGL)
-include_directories(${GLUT_INCLUDE_DIRS} )
-target_include_directories(test_julia_plot_cuda PUBLIC ${INCLUDE_DIR})
+    add_dependencies(${TEST} OpenGL::OpenGL)
+    include_directories(${GLUT_INCLUDE_DIRS} )
+    target_include_directories(${TEST} PUBLIC ${INCLUDE_DIR})
+endforeach()
