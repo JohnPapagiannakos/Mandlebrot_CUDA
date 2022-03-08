@@ -61,7 +61,12 @@ class figure
             
             glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
             glutInitWindowSize(_resolution[0], _resolution[1]);
-            
+            // for (auto &d : _resolution)
+            // {
+            //     std::cout << d << "\t";
+            // }
+            // std::cout << std::endl;
+
             GLenum error_code = glewInit();
             if (error_code != 0)
             {
@@ -115,6 +120,37 @@ class figure
             // glutMainLoop();
         }
 
+        /*
+        clim argument specifies the data values that map to the first and last elements of the colormap. 
+        Specify clims as a two-element vector of the form {cmin cmax}, where values less than or equal 
+        to cmin map to the first color in the colormap and values greater than or equal to cmax map to 
+        the last color in the colormap. Specify clims after name-value pair arguments.
+         */
+        void plot(const std::vector<T> &_data, const std::array<T,2> &clim)
+        {
+            size_t prod_dims = _data.size();
+
+            std::vector<T> tmpdata = _data;
+            
+            if (clim[0] >= clim[1])
+            {
+                std::cerr << "Error! clim[0] >= clim[1]" << std::endl;
+                return;
+            }
+
+            /*
+                             { clim[0], if _data[i] < clim[0]
+                tmpdata[i] = { _data  , if _data[i] >= clim[0] and  _data[i] <= clim[1]
+                             { clim[1], otherwise
+            */
+            for (size_t i=0; i<prod_dims; i++)
+            {
+                tmpdata[i] = ((_data[i] < clim[0]) * clim[0]) + (((_data[i] >= clim[0]) * (_data[i] <= clim[1])) * _data[i]) + ((_data[i] > clim[1]) * clim[1]);
+            }
+
+            plot(tmpdata);
+        }
+
     public:
         figure() : _resolution({1920, 1080})
         {
@@ -129,12 +165,13 @@ class figure
         void plotRGB(const std::vector<double> &_DATA)
         {
             // initFigure();
-            for(auto &d: _resolution)
-            {
-                std::cout << d << "\t";
-            }
-            std::cout << std::endl;
             plot(_DATA);
+        }
+
+        void plotRGB(const std::vector<double> &_DATA, const std::array<T, 2> &clim)
+        {
+            // initFigure();
+            plot(_DATA, clim);
         }
 
         void newFigure(void)
