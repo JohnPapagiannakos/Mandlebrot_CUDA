@@ -89,12 +89,13 @@ class figure
 
             // Normalize data in [0, 1]
             T max = *max_element(_data.begin(), _data.end());
-
-            std::vector<T> tmpdata = _data;
+            T min = *min_element(_data.begin(), _data.end());
+            T diff = max - min;
+            std::vector<T> tmpdata(prod_dims);
 
             for (size_t i = 0; i < prod_dims; i++)
             {
-                tmpdata[i] /= max;
+                tmpdata[i] = (_data[i] - min) / diff;
             }
 
             // Multiply by 2 ^ 24
