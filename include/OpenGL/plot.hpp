@@ -5,30 +5,31 @@
 #include <GL/glut.h>
 // #include <cstdlib>
 #include <iostream>
-#include <cstdlib>
 #include <iostream>
-#include <ctime>
 #include <vector>
 #include <array>
 #include <cassert>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
 
 #include "OGLConstants.hpp"
 
-/* Let a 24-bit number N = B23 B22 ... B01 B00
-   We can assume that this number can be represented in RGB 24bit color model as follows:
+    /* Let a 24-bit number N = B23 B22 ... B01 B00
+       We can assume that this number can be represented in RGB 24bit color model as follows:
 
-    <Red>  := B23 B22 ... B17 (8bit)
-   <Green> := B15 B14 ... B08 (8bit)
-   <Blue>  := B07 B06 ... B00 (8bit)
+        <Red>  := B23 B22 ... B17 (8bit)
+       <Green> := B15 B14 ... B08 (8bit)
+       <Blue>  := B07 B06 ... B00 (8bit)
 
-   Each color information can be extracted through typeXbyte (X:R,G,B).
+       Each color information can be extracted through typeXbyte (X:R,G,B).
 
-*/
+    */
 
-/*
-    Extract Red color from a 24bit number (24-bit RGB model).
- */
-inline GLubyte uint2Rbyte(const unsigned int &value)
+    /*
+        Extract Red color from a 24bit number (24-bit RGB model).
+     */
+    inline GLubyte uint2Rbyte(const unsigned int &value)
 {
     return value >> 16;
 }
@@ -87,15 +88,33 @@ class figure
             size_t prod_dims = _data.size();
             assert(_resolution[0] * _resolution[1] == prod_dims);
 
-            // Normalize data in [0, 1]
+            std::vector<T> tmpdata = _data;
+            
             T max = *max_element(_data.begin(), _data.end());
             T min = *min_element(_data.begin(), _data.end());
-            T diff = max - min;
-            std::vector<T> tmpdata(prod_dims);
 
-            for (size_t i = 0; i < prod_dims; i++)
+            // Normalize data in [0, 1]
+            if (min > 0 || std::isinf(min))
             {
-                tmpdata[i] = (_data[i] - min) / diff;
+                for (size_t i = 0; i < prod_dims; i++)
+                {
+                    tmpdata[i] /= max;
+                }
+            }
+            else if (min < 0 && max > 0)
+            {
+                T diff = max - min - min;
+                for (size_t i = 0; i < prod_dims; i++)
+                {
+                    tmpdata[i] = (_data[i] - min - min) / diff;
+                }
+            }
+            else if (max < 0)
+            {
+                for (size_t i = 0; i < prod_dims; i++)
+                {
+                    tmpdata[i] = _data[i] / max;
+                }
             }
 
             // Multiply by 2 ^ 24
