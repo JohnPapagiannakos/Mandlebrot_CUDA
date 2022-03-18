@@ -15,21 +15,23 @@
 
 #include "OGLConstants.hpp"
 
-    /* Let a 24-bit number N = B23 B22 ... B01 B00
-       We can assume that this number can be represented in RGB 24bit color model as follows:
+bool FIGLOCK = false;
 
-        <Red>  := B23 B22 ... B17 (8bit)
-       <Green> := B15 B14 ... B08 (8bit)
-       <Blue>  := B07 B06 ... B00 (8bit)
+/* Let a 24-bit number N = B23 B22 ... B01 B00
+    We can assume that this number can be represented in RGB 24bit color model as follows:
 
-       Each color information can be extracted through typeXbyte (X:R,G,B).
+    <Red>  := B23 B22 ... B17 (8bit)
+    <Green> := B15 B14 ... B08 (8bit)
+    <Blue>  := B07 B06 ... B00 (8bit)
 
+    Each color information can be extracted through typeXbyte (X:R,G,B).
+
+*/
+
+/*
+    Extract Red color from a 24bit number (24-bit RGB model).
     */
-
-    /*
-        Extract Red color from a 24bit number (24-bit RGB model).
-     */
-    inline GLubyte uint2Rbyte(const unsigned int &value)
+inline GLubyte uint2Rbyte(const unsigned int &value)
 {
     return value >> 16;
 }
@@ -65,7 +67,7 @@ class figure
             int argc = 1;
             char *argv[1] = {(char *)"unused"};
             glutInit(&argc, argv);
-            
+            FIGLOCK = true;
             glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
             glutInitWindowSize(_resolution[0], _resolution[1]);
             // for (auto &d : _resolution)
@@ -103,10 +105,10 @@ class figure
             }
             else if (min < 0 && max > 0)
             {
-                T diff = max - min - min;
+                T diff = max - min;
                 for (size_t i = 0; i < prod_dims; i++)
                 {
-                    tmpdata[i] = (_data[i] - min - min) / diff;
+                    tmpdata[i] = (_data[i] - min) / diff;
                 }
             }
             else if (max < 0)
@@ -180,12 +182,18 @@ class figure
     public:
         figure() : _resolution({1920, 1080})
         {
-            initFigure();
+            if(!FIGLOCK)
+            {
+                initFigure();
+            }
         }
 
         figure(std::array<size_t, 2> Resolution) : _resolution(Resolution)
         {
-            initFigure();
+            if (!FIGLOCK)
+            {
+                initFigure();
+            }
         }
 
         void plotRGB(const std::vector<double> &_DATA)
